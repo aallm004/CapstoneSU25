@@ -175,11 +175,9 @@ Don't forget to give the project a star! Thanks again!
   <img src="https://contrib.rocks/image?repo=aallm004/CapstoneSU25" alt="contrib.rocks image" />
 </a>
 <a href="https://github.com/mattkrozel/CapstoneSU25/graphs/contributors">
-  <img src="https://contrib.rocks/image?repo=mattkrozel/CapstoneSU25" alt="contrib.rocks image" />
+  <img src="https://avatars.githubusercontent.com/u/132094023?s=60&v=4" alt="contrib.rocks image" />
 </a>
-<a href="https://github.com/jerm014/CapstoneSU25/graphs/contributors">
-  <img src="https://contrib.rocks/image?repo=jerm014/CapstoneSU25" alt="contrib.rocks image" />
-</a>
+
 
 
 
