@@ -4,15 +4,9 @@ triggers
 
 Web Interface: HTML pages for browswer
 RESTful API: Json endpoints for programmatic access (curl, frontend)"""
-from flask import Flask, render_template, request, jsonify, redirect, url_for
 import json
 import requests
-import uuid
 from datetime import datetime
-from botocore.exceptions import ClientError
-import os
-
-app = Flask(__name__)
 
 api = "https://dczq55guecss3nfqektmhapolq0dgnkw.lambda-url.us-east-1.on.aws/"
 key = ""
