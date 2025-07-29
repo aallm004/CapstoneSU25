@@ -19,17 +19,17 @@ const media = {
 export const StyledChatBotUI = styled.div`
   width: 100%;
   max-width: 1280px;
-  height: 100vh;
+  min-height: 100vh;
   min-height: 832px;
   position: relative;
   background: white;
-  overflow: hidden;
+  overflow-y: auto;
+  overflow-x: hidden;
   border-radius: clamp(16px, 2.5vw, 32px);
   margin: 0 auto;
 
   ${media.mobile} {
     border-radius: 0;
-    height: 100vh;
     min-height: 100vh;
   }
 `;
@@ -67,7 +67,7 @@ export const StyledHeader = styled.div`
   background: white;
   border-bottom: 1px solid #D9D9D9;
   display: flex;
-  justify-content: space-between;
+  justify-content: flex-end;
   align-items: center;
   gap: 24px;
   flex-wrap: wrap;
@@ -132,10 +132,12 @@ export const StyledFrame22 = styled.div`
   padding: 0 20px;
 
   ${media.mobile} {
-    position: static;
+    position: relative;
     transform: none;
     margin: clamp(80px, 15vh, 140px) auto clamp(40px, 8vh, 80px);
     padding: 0 16px;
+    left: auto;
+    top: auto;
   }
 `;
 
@@ -159,10 +161,12 @@ export const StyledBottomSection = styled.div`
   z-index: 5;
 
   ${media.mobile} {
-    position: static;
+    position: relative;
     transform: none;
     width: calc(100% - 32px);
     margin: auto auto 40px;
+    left: auto;
+    bottom: auto;
   }
 `;
 
