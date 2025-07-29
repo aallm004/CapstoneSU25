@@ -13,10 +13,12 @@ key = ""
 
 def dashboard():
     key = input('Please provide authorization key: ')
-    response = requests.get(api).json()
-    _, items = list(response.items())[2]
-    while True:
 
+    while True:
+        response = requests.get(api).json()
+        _, items = list(response.items())[2]
+
+        print("\n" + "=" * 50)
         print("Current triggers: ")
         itemId = []
         itemTrigger = []
@@ -30,7 +32,7 @@ def dashboard():
             itemId.append(e['id'])
             itemTrigger.append(e['trigger'])
             itemResponse.append(e['response'])
-
+        print("=" * 50)
         prompt = input("Would you like to [a]dd, [r]emove, [e]dit, or [q]uit? ")
         
         if prompt.lower() == "a":
@@ -60,35 +62,38 @@ def dashboard():
         
         elif prompt.lower() == "e":
             prompt = input("Which trigger would you like to change? ")
-            oldTrigger = itemTrigger[int(prompt)-1]
-            newTrigger = input(f"How would you like to change this word? [{oldTrigger}]")
-            if newTrigger == '':
-                newTrigger = oldTrigger
-            oldResponse = itemResponse[int(prompt)-1]
-            newResponse = input(f"What would you like your new response to be? [{oldResponse}]")
-            if newResponse == '':
-                newResponse = oldResponse
-            payload = {
-                "trigger": newTrigger,
-                "response": newResponse
-            }
-            updateUrl = f"{api}item/{itemId[int(prompt)-1]}?key={key}"
-            headers = {
-                "Content-Type": 'application/json'
-            }
-            if oldTrigger == newTrigger and oldResponse == newResponse:
-                print("Nothing to change")
-                continue
-
             try:
+              oldTrigger = itemTrigger[int(prompt)-1]
+              newTrigger = input(f"How would you like to change this word? [{oldTrigger}] ")
+              if newTrigger == '':
+                  newTrigger = oldTrigger
+              oldResponse = itemResponse[int(prompt)-1]
+              newResponse = input(f"What would you like your new response to be? [{oldResponse}] ")
+              if newResponse == '':
+                  newResponse = oldResponse
+              payload = {
+                  "trigger": newTrigger,
+                  "response": newResponse
+              }
+              updateUrl = f"{api}item/{itemId[int(prompt)-1]}?key={key}"
+              headers = {
+                  "Content-Type": 'application/json'
+              }
+              if oldTrigger == newTrigger and oldResponse == newResponse:
+                  print("Nothing to change")
+                  continue
+
+              try:
                 outcome = requests.put(updateUrl, json=payload, headers=headers)
                 if outcome.status_code == 200:
                     print("Your trigger has been updated!")
                 else:
                     print(f"Failure {outcome.status_code} {outcome.text}")
-            except requests.exceptions.RequestException as e:
+              except requests.exceptions.RequestException as e:
                 print(f"Request Failed {e}")
-
+            except: # if there are any issues with stuff, just bail.
+              print("Invalid option there! Try again!")
+              continue
 
         elif prompt.lower() == "q":
             break
