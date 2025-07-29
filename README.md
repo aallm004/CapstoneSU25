@@ -20,7 +20,7 @@
 <br />
 <div align="center">
   <a href="https://github.com/aallm004/CapstoneSU25">
-    <img src="images/logo.png" alt="Logo" width="80" height="80">
+    <img src="./public/logo512.png" alt="Logo" width="80" height="80">
   </a>
 
 <h3 align="center">Safe of Mind</h3>
@@ -72,9 +72,9 @@
 <!-- ABOUT THE PROJECT -->
 ## About The Project
 
-[![Product Name Screen Shot][product-screenshot]](https://example.com)
 
-Here's a blank template to get started. To avoid retyping too much info, do a search and replace with your text editor for the following: `aallm004`, `CapstoneSU25`, ``, ``, ``, ``, `Safe of Mind`, `Web application where a user can interact with and that provides mental health resources, coping strategies, and psychoeducation.`, ``
+
+
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
@@ -173,6 +173,12 @@ Don't forget to give the project a star! Thanks again!
 
 <a href="https://github.com/aallm004/CapstoneSU25/graphs/contributors">
   <img src="https://contrib.rocks/image?repo=aallm004/CapstoneSU25" alt="contrib.rocks image" />
+</a>
+<a href="https://github.com/mattkrozel/CapstoneSU25/graphs/contributors">
+  <img src="https://contrib.rocks/image?repo=mattkrozel/CapstoneSU25" alt="contrib.rocks image" />
+</a>
+<a href="https://github.com/jerm014/CapstoneSU25/graphs/contributors">
+  <img src="https://contrib.rocks/image?repo=jerm014/CapstoneSU25" alt="contrib.rocks image" />
 </a>
 
 
