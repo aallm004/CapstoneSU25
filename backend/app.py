@@ -13,6 +13,7 @@ key = ""
 
 def dashboard():
     key = input('Please provide authorization key: ')
+    show_responses = False
 
     while True:
         response = requests.get(api).json()
@@ -27,14 +28,17 @@ def dashboard():
         i = 0
         for e in items:
             i = i + 1
-            print(f"{i}. {e['trigger']} [{e['response']}]")
+            response_part = f" [{e['response']}]" if show_responses else ""
+            print(f"{i}. {e['trigger']}{response_part}")
+
             # trigger=kill     response=Call 988
             itemId.append(e['id'])
             itemTrigger.append(e['trigger'])
             itemResponse.append(e['response'])
         print("=" * 50)
-        prompt = input("Would you like to [a]dd, [r]emove, [e]dit, or [q]uit? ")
-        
+        responses_option = "[h]ide responses" if show_responses else "[s]how responses"
+        prompt = input(f"Would you like to:\n  [a]dd\n  [r]emove\n  [e]dit\n  {responses_option}\n  [q]uit\n ")
+
         if prompt.lower() == "a":
             trigger = input("What trigger word would you like to add? ")
             response = input("What is the response to this trigger? ")
@@ -54,6 +58,12 @@ def dashboard():
                     print(f"Failure {outcome.status_code} {outcome.text}")
             except requests.exceptions.RequestException as e:
                 print(f"Request Failed {e}")
+
+        elif prompt.lower() == "s":
+            show_responses = True
+
+        elif prompt.lower() == "h":
+            show_responses = False
 
         elif prompt.lower() == "r":
             prompt = input("Which trigger word would you like to remove? ")
