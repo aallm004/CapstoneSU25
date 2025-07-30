@@ -1,0 +1,434 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>System Prompt Editor</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+        
+        .container {
+            background: white;
+            border-radius: 12px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
+        
+        h1 {
+            text-align: center;
+            color: #4a5568;
+            margin-bottom: 30px;
+            font-size: 2.5em;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .status {
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            font-weight: 500;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+        
+        .status.loading {
+            background: #bee3f8;
+            color: #2b6cb0;
+            border: 1px solid #90cdf4;
+        }
+        
+        .status.success {
+            background: #c6f6d5;
+            color: #22543d;
+            border: 1px solid #68d391;
+        }
+        
+        .status.error {
+            background: #fed7d7;
+            color: #c53030;
+            border: 1px solid #fc8181;
+        }
+        
+        .form-group {
+            margin-bottom: 25px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #4a5568;
+            font-size: 1.1em;
+        }
+        
+        textarea {
+            width: 100%;
+            min-height: 300px;
+            padding: 15px;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+            font-size: 14px;
+            line-height: 1.6;
+            resize: vertical;
+            transition: border-color 0.3s ease, box-shadow 0.3s ease;
+            box-sizing: border-box;
+        }
+        
+        textarea:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+        
+        .button-group {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+        
+        .notbutton {
+            padding: 12px 30px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: not-allowed;
+            min-width: 120px;
+            background: linear-gradient(45deg, #9ae6b4, #68d391);
+            color: white;
+        }
+
+        button {
+            padding: 12px 30px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            min-width: 120px;
+        }
+
+        button:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+
+        button:active:not(:disabled) {
+            transform: translateY(0);
+        }
+
+        button:disabled {
+            cursor: default !important;
+            opacity: 0.6;
+            pointer-events: none; /* Prevents all mouse interactions */
+        }
+
+        /* Make sure disabled buttons don't get hover/active styles */
+        button:disabled:hover {
+            transform: none !important;
+            box-shadow: none !important;
+        }
+
+        button:disabled:active {
+            transform: none !important;
+        }
+
+        .btn-primary {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+        }
+        
+        .btn-secondary {
+            background: #e2e8f0;
+            color: #4a5568;
+        }
+        
+        .btn-success {
+            background: linear-gradient(45deg, #48bb78, #38a169);
+            color: white;
+        }
+
+        .api-info {
+            background: #f7fafc;
+            border-left: 4px solid #667eea;
+            padding: 15px;
+            margin-bottom: 20px;
+            border-radius: 0 8px 8px 0;
+        }
+        
+        .api-info strong {
+            color: #667eea;
+        }
+
+        .red {
+          color: red;
+          font-weight: bold;
+        }
+
+        @media (max-width: 768px) {
+            body {
+                padding: 10px;
+            }
+            
+            .container {
+                padding: 20px;
+            }
+            
+            h1 {
+                font-size: 2em;
+            }
+            
+            .button-group {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            button {
+                width: 100%;
+                max-width: 300px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🤖 System Prompt Editor</h1>
+        
+        <div id="status" class="status" style="display: none;"></div>
+        
+        <div class="api-info">
+            <strong>API Endpoint:</strong> <span id="apiEndpoint">Loading...</span><br>
+            <strong>Auth Status:</strong> <span id="authStatus">Checking...</span><br>
+            <strong>Token status:</strong> <span id="minutesStatus">Checking...</span>
+        </div>
+        
+        <div class="form-group">
+            <label for="systemPrompt">System Prompt:</label>
+            <textarea 
+                id="systemPrompt" 
+                placeholder="Loading current system prompt..."
+                disabled
+            ></textarea>
+        </div>
+        
+        <div class="button-group">
+            <button id="loadBtn" class="btn-secondary" onclick="loadSystemPrompt()">
+                🔄 Reload
+            </button>
+            <button id="saveBtn" class="btn-success" onclick="saveSystemPrompt()" disabled>
+                💾 Save Changes
+            </button>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = 'https://dczq55guecss3nfqektmhapolq0dgnkw.lambda-url.us-east-1.on.aws/';
+        let apiKey = '';
+        let originalPrompt = '';
+        let minutesUntilExpiration = 0;
+        const timer = setInterval(removeMinute, 60000);
+
+        // Get API key from query string
+        function getApiKeyFromQuery() {
+            const urlParams = new URLSearchParams(window.location.search);
+            return urlParams.get('key') || urlParams.get('apikey') || urlParams.get('api_key');
+        }
+
+        // Show status message
+        function showStatus(message, type = 'loading') {
+            const statusEl = document.getElementById('status');
+            statusEl.textContent = message;
+            statusEl.className = `status ${type}`;
+            statusEl.style.display = 'block';
+            
+            if (type === 'success' || type === 'error') {
+                setTimeout(() => {
+                    statusEl.style.display = 'none';
+                }, 5000);
+            }
+        }
+
+        // update the minutes remaining
+        function updateMinutes(m) {
+            if (m==1) s = ""; else s="s";
+            minutesUntilExpiration = m;
+            const statusEl = document.getElementById('minutesStatus');
+            const saveBtn = document.getElementById('saveBtn');
+
+            if (!m || m<5)
+              statusEl.classList.add('red');
+            else
+              statusEl.classList.remove('red');
+
+            if (!m || m<0) {
+                statusEl.textContent = `expired`;
+                saveBtn.outerHTML=`<span id="saveBtn" class="notbutton">💾 Save Changes</span>`
+            } else
+              statusEl.textContent = `${m} minute${s} remaining`;
+
+        }
+
+        function removeMinute() {
+          minutesUntilExpiration -= 1;
+          updateMinutes(minutesUntilExpiration);
+        }
+
+        // Make API request with auth headers
+        async function apiRequest(endpoint, options = {}) {
+            const headers = {
+                'Content-Type': 'application/json',
+                ...options.headers
+            };
+
+            if (apiKey) {
+                headers['Authorization'] = `Bearer ${apiKey}`;
+            }
+
+            const response = await fetch(API_BASE + endpoint, {
+                ...options,
+                headers
+            });
+
+            if (!response.ok) {
+                throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+            }
+
+            return response.json();
+        }
+
+        // Load current system prompt
+        async function loadSystemPrompt() {
+            const loadBtn = document.getElementById('loadBtn');
+            const textarea = document.getElementById('systemPrompt');
+            
+            try {
+                loadBtn.disabled = true;
+                showStatus('Loading system prompt...', 'loading');
+                
+                // Try to get system prompt from your API
+                // You'll need to add a GET endpoint for this
+                const response = await apiRequest('systemprompt');
+                
+                if (response.systemPrompt) {
+                    updateMinutes(response.minutesUntilExpiration);
+                    if (!response.minutesUntilExpiration)
+                        originalPrompt = response.systemPrompt;
+                    else
+                        originalPrompt = "";
+                    textarea.value = originalPrompt;
+                    textarea.disabled = false;
+                    document.getElementById('saveBtn').disabled = false;
+                    if (typeof response.minutesUntilExpiration != 'undefined')
+                        showStatus('System prompt loaded successfully!', 'success');
+                    else
+                        showStatus(`Your update token has expired.`, 'success');
+                } else {
+                    throw new Error('No system prompt returned from API');
+                }
+                
+            } catch (error) {
+                console.error('Error loading system prompt:', error);
+                showStatus(`Error loading prompt: ${error.message}`, 'error');
+                
+                // Enable textarea anyway so user can enter a new prompt
+                textarea.disabled = false;
+                textarea.placeholder = 'Enter your system prompt here...';
+                document.getElementById('saveBtn').disabled = false;
+            } finally {
+                loadBtn.disabled = false;
+            }
+        }
+
+        // Save system prompt
+        async function saveSystemPrompt() {
+            const saveBtn = document.getElementById('saveBtn');
+            const textarea = document.getElementById('systemPrompt');
+            const newPrompt = textarea.value.trim();
+            
+            if (!newPrompt) {
+                showStatus('Please enter a system prompt before saving.', 'error');
+                return;
+            }
+
+            if (newPrompt === originalPrompt) {
+                showStatus('No changes to save.', 'error');
+                return;
+            }
+
+            try {
+                saveBtn.disabled = true;
+                showStatus('Saving system prompt...', 'loading');
+
+                // Send PUT request to update system prompt
+                const response = await apiRequest('systemprompt', {
+                    method: 'PUT',
+                    body: JSON.stringify({
+                        systemPrompt: newPrompt
+                    })
+                });
+
+                if (response.success || response.message) {
+                    originalPrompt = newPrompt;
+                    showStatus('System prompt saved successfully!', 'success');
+                    updateMinutes(response.minutesUntilExpiration);
+                } else {
+                    throw new Error('Unexpected response from server');
+                }
+
+              } catch (error) {
+                console.error('Error saving system prompt:', error);
+                showStatus(`Error saving prompt: ${error.message}`, 'error');
+            } finally {
+                saveBtn.disabled = false;
+            }
+        }
+
+        // Initialize the page
+        async function init() {
+            // Get API key from query string
+            apiKey = getApiKeyFromQuery();
+            
+            // Update UI with API info
+            document.getElementById('apiEndpoint').textContent = API_BASE;
+            document.getElementById('authStatus').textContent = apiKey ? 
+                '✅ Token provided' : '❌ No token (add ?key=VALID_TOKEN to URL)';
+
+            if (!apiKey) {
+                showStatus('Please add your token to the URL: ?key=VALID_TOKEN', 'error');
+                return;
+            }
+
+            // Load current system prompt
+            await loadSystemPrompt();
+        }
+
+        // Initialize when page loads
+        window.addEventListener('DOMContentLoaded', init);
+
+        // Auto-save indicator
+        document.getElementById('systemPrompt').addEventListener('input', function() {
+            const saveBtn = document.getElementById('saveBtn');
+            const hasChanges = this.value.trim() !== originalPrompt;
+            
+            if (hasChanges) {
+                saveBtn.textContent = '💾 Save Changes*';
+                saveBtn.className = 'btn-success';
+            } else {
+                saveBtn.textContent = '💾 Save Changes';
+                saveBtn.className = 'btn-success';
+            }
+        });
+    </script>
+</body>
+</html>

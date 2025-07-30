@@ -1,12 +1,17 @@
-"""Admin Panel
+"""Admin Tool
 Provides Web Interface and Restful API for managing suicide prevention 
-triggers
+triggers and handling conversations with users.
 
-Web Interface: HTML pages for browswer
 RESTful API: Json endpoints for programmatic access (curl, frontend)"""
+
 import json
 import requests
 from datetime import datetime
+import webbrowser
+import os
+import sys
+import subprocess
+
 
 api = "https://dczq55guecss3nfqektmhapolq0dgnkw.lambda-url.us-east-1.on.aws/"
 key = ""
@@ -56,6 +61,82 @@ def format_grid_display(items, show_responses=False):
     
     return formatted_lines
 
+def open_system_prompt_editor(key):
+    """ this just opens a web page with the current key."""
+
+    try:
+        # Create a token from the API key
+        print("Creating temporary token...")
+        
+        headers = {
+            "Authorization": f"Bearer {key}",
+            "Content-Type": "application/json"
+        }
+        
+        token_response = requests.post(f"{api}token", headers=headers)
+        
+        if token_response.status_code == 200:
+            token_data = token_response.json()
+            token = token_data.get('token')
+            
+            if not token:
+                print("Error: No token returned from API")
+                return
+                
+            print("Token created successfully")
+        else:
+            print(f"Error creating token: {token_response.status_code} - {token_response.text}")
+            return
+            
+    except requests.exceptions.RequestException as e:
+        print(f"Error connecting to API: {e}")
+        return
+    except Exception as e:
+        print(f"Unexpected error: {e}")
+        return
+
+    # Get the full path to the HTML file
+    current_dir = os.path.dirname(os.path.abspath(__file__))
+    html_file = os.path.join(current_dir, "systemprompt.html")
+    url = f"file://{html_file}?key={token}"
+    
+    # Try different methods to open Chrome
+    chrome_commands = []
+    
+    if sys.platform == "win32":
+        chrome_commands = [
+            "C:/Program Files/Google/Chrome/Application/chrome.exe",
+            "C:/Program Files (x86)/Google/Chrome/Application/chrome.exe",
+        ]
+    elif sys.platform == "darwin":  # macOS
+        chrome_commands = [
+            "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome"
+        ]
+    else:  # Linux
+        chrome_commands = [
+            "google-chrome",
+            "google-chrome-stable",
+            "chromium-browser",
+            "chromium"
+        ]
+
+    # Try to launch Chrome directly
+    for chrome_cmd in chrome_commands:
+        try:
+            subprocess.run([chrome_cmd, url], check=True)
+            print(f"Opened system prompt editor in Chrome: {url}")
+            return
+        except (subprocess.CalledProcessError, FileNotFoundError):
+            continue
+    
+    # Fallback to default browser
+    try:
+        webbrowser.open(url)
+        print(f"Opened system prompt editor in default browser: {url}")
+    except Exception as e:
+        print(f"Could not open browser: {e}")
+        print(f"Please manually open: {url}")
+
 def dashboard():
     key = input('Please provide authorization key: ')
     show_responses = False
@@ -64,9 +145,6 @@ def dashboard():
         response = requests.get(api).json()
         _, items = list(response.items())[2]
 
-        print("\n" + "=" * 80)
-        print("Current triggers:")
-        
         itemId = []
         itemTrigger = []
         itemResponse = []
@@ -79,16 +157,24 @@ def dashboard():
         
         # Display formatted grid
         formatted_lines = format_grid_display(items, show_responses)
+        max_length = max(len(line) for line in formatted_lines)
+        print("\n" + "=" * max_length)
+        print("Current saved triggers:")
+
         for line in formatted_lines:
             print(line)
         
-        print("=" * 80)
+        print("=" * max_length)
         responses_option = "[h]ide responses" if show_responses else "[s]how responses"
-        prompt = input(f"Would you like to:\n  [a]dd\n  [r]emove\n  [e]dit\n  {responses_option}\n  [q]uit\n ")
+        prompt = input(f"Would you like to:\n  [a]dd\n  [r]emove\n  [e]dit\n  {responses_option}\n  re[n]ter API key\n  [u]pdate System Prompt\n  [q]uit\n ")
 
         if prompt.lower() == "a":
             trigger = input("What trigger word would you like to add? ")
+            if trigger == "":
+                continue
             response = input("What is the response to this trigger? ")
+            if response == "":
+                continue
             payload = {
                 "trigger": trigger,
                 "response": response
@@ -103,11 +189,8 @@ def dashboard():
             except requests.exceptions.RequestException as e:
                 print(f"Request Failed {e}")
 
-        elif prompt.lower() == "s":
-            show_responses = True
-
-        elif prompt.lower() == "h":
-            show_responses = False
+        elif (prompt.lower() == "s") or (prompt.lower() == "h"):
+            show_responses = not show_responses
 
         elif prompt.lower() == "r":
             prompt = input("Which trigger word would you like to remove? ")
@@ -156,6 +239,12 @@ def dashboard():
             except: # if there are any issues with stuff, just bail.
                 print("Invalid option there! Try again!")
                 continue
+
+        elif prompt.lower() == "n":
+            key = input('Please provide authorization key: ')
+
+        elif prompt.lower() == "u":
+            open_system_prompt_editor(key)
 
         elif prompt.lower() == "q":
             break
