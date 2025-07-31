@@ -322,7 +322,7 @@
                 
                 if (response.systemPrompt) {
                     updateMinutes(response.minutesUntilExpiration);
-                    if (!response.minutesUntilExpiration)
+                    if (response.minutesUntilExpiration)
                         originalPrompt = response.systemPrompt;
                     else
                         originalPrompt = "";
