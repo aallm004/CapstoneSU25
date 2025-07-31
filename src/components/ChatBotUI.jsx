@@ -9,6 +9,10 @@ import {
   StyledTitle,
   StyledFrame22,
   StyledAskOurAssistantAnything,
+  StyledChatContainer,
+  StyledChatMessages,
+  StyledMessage,
+  StyledMessageText,
   StyledBottomSection,
   StyledSuggestionsTitle,
   StyledSuggestionCards,
@@ -22,6 +26,7 @@ import {
 
 export const ChatBotUI = () => {
   const [inputValue, setInputValue] = useState("");
+  const [messages, setMessages] = useState([]);
   
   const suggestions = [
     "What can I ask you to do?",
@@ -35,8 +40,24 @@ export const ChatBotUI = () => {
 
   const handleSendClick = () => {
     if (inputValue.trim()) {
-      console.log("Sending:", inputValue);
-      // Add your send logic here
+      // Add user message
+      const newMessage = {
+        id: Date.now(),
+        text: inputValue,
+        sender: 'user'
+      };
+      setMessages(prev => [...prev, newMessage]);
+      
+      // Simulated assistant response, need to replace with our own api call
+      setTimeout(() => {
+        const assistantMessage = {
+          id: Date.now() + 1,
+          text: "Thank you for your message. I'm here to help with your mental health concerns.",
+          sender: 'assistant'
+        };
+        setMessages(prev => [...prev, assistantMessage]);
+      }, 1000);
+      
       setInputValue("");
     }
   };
@@ -68,6 +89,27 @@ export const ChatBotUI = () => {
           Ask our Assistant anything
         </StyledAskOurAssistantAnything>
       </StyledFrame22>
+
+      {/* Chat Container */}
+      <StyledChatContainer>
+        <StyledChatMessages>
+          {messages.length === 0 ? (
+            <StyledMessage>
+              <StyledMessageText style={{ fontStyle: 'italic', opacity: 0.7 }}>
+                Start a conversation by typing a message below or clicking on a suggestion.
+              </StyledMessageText>
+            </StyledMessage>
+          ) : (
+            messages.map((message) => (
+              <StyledMessage key={message.id} isUser={message.sender === 'user'}>
+                <StyledMessageText isUser={message.sender === 'user'}>
+                  {message.text}
+                </StyledMessageText>
+              </StyledMessage>
+            ))
+          )}
+        </StyledChatMessages>
+      </StyledChatContainer>
 
       <StyledBottomSection>
         <StyledSuggestionsTitle>
