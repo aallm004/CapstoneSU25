@@ -151,6 +151,91 @@ export const StyledAskOurAssistantAnything = styled.span`
   word-wrap: break-word;
 `;
 
+export const StyledChatContainer = styled.div`
+  position: absolute;
+  top: clamp(280px, 45vh, 350px);
+  left: 50%;
+  transform: translateX(-50%);
+  width: calc(100% - clamp(40px, 6vw, 80px));
+  max-width: 800px;
+  height: clamp(200px, 30vh, 300px);
+  background: rgba(255, 255, 255, 0.75);
+  backdrop-filter: blur(10px);
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  z-index: 5;
+  overflow: hidden;
+
+  ${media.mobile} {
+    position: relative;
+    transform: none;
+    width: calc(100% - 32px);
+    margin: clamp(40px, 8vh, 60px) auto clamp(20px, 4vh, 40px);
+    left: auto;
+    top: auto;
+    height: clamp(250px, 35vh, 350px);
+  }
+`;
+
+export const StyledChatMessages = styled.div`
+  height: 100%;
+  padding: clamp(16px, 2vw, 24px);
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: clamp(12px, 1.5vh, 16px);
+
+  &::-webkit-scrollbar {
+    width: 6px;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: rgba(0, 0, 0, 0.1);
+    border-radius: 3px;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background: rgba(0, 0, 0, 0.3);
+    border-radius: 3px;
+  }
+
+  &::-webkit-scrollbar-thumb:hover {
+    background: rgba(0, 0, 0, 0.5);
+  }
+`;
+
+export const StyledMessage = styled.div`
+  display: flex;
+  justify-content: ${props => props.isUser ? 'flex-end' : 'flex-start'};
+  margin-bottom: clamp(8px, 1vh, 12px);
+`;
+
+export const StyledMessageText = styled.div`
+  max-width: 80%;
+  padding: clamp(10px, 1.2vw, 12px) clamp(14px, 1.8vw, 16px);
+  border-radius: 12px;
+  font-size: clamp(13px, 1.1vw, 14px);
+  font-family: 'DM Sans', sans-serif;
+  font-weight: 400;
+  line-height: 1.4;
+  word-wrap: break-word;
+
+  ${props => props.isUser ? `
+    background: #007AFF;
+    color: white;
+    border-bottom-right-radius: 4px;
+  ` : `
+    background: rgba(245, 245, 245, 0.9);
+    color: #160211;
+    border-bottom-left-radius: 4px;
+  `}
+
+  ${media.mobile} {
+    max-width: 90%;
+    font-size: 14px;
+  }
+`;
+
 export const StyledBottomSection = styled.div`
   position: absolute;
   bottom: clamp(40px, 8vh, 80px);
@@ -267,90 +352,4 @@ export const StyledSendIcon = styled.div`
   height: clamp(13px, 1.8vw, 16px);
   background: #1D1B20;
   clip-path: polygon(0 50%, 100% 0, 100% 100%);
-`;
-
-export const StyledChatContainer = styled.div`
-  position: absolute;
-  top: clamp(280px, 45vh, 350px);
-  left: 50%;
-  transform: translateX(-50%);
-  width: calc(100% - clamp(40px, 6vw, 80px));
-  max-width: 800px;
-  height: clamp(200px, 30vh, 300px);
-  background: rgba(255, 255, 255, 0.75);
-  backdrop-filter: blur(10px);
-  border-radius: 12px;
-  border: 1px solid rgba(255, 255, 255, 0.3);
-  z-index: 5;
-  overflow: hidden;
-
-  ${media.mobile} {
-    position: relative;
-    transform: none;
-    width: calc(100% - 32px);
-    margin: clamp(40px, 8vh, 60px) auto clamp(20px, 4vh, 40px);
-    left: auto;
-    top: auto;
-    height: clamp(250px, 35vh, 350px);
-  }
-`;
-
-export const StyledChatMessages = styled.div`
-  height: 100%;
-  padding: clamp(16px, 2vw, 24px);
-  overflow-y: auto;
-  display: flex;
-  flex-direction: column;
-  gap: clamp(12px, 1.5vh, 16px);
-
-  /* Custom scrollbar */
-  &::-webkit-scrollbar {
-    width: 6px;
-  }
-
-  &::-webkit-scrollbar-track {
-    background: rgba(0, 0, 0, 0.1);
-    border-radius: 3px;
-  }
-
-  &::-webkit-scrollbar-thumb {
-    background: rgba(0, 0, 0, 0.3);
-    border-radius: 3px;
-  }
-
-  &::-webkit-scrollbar-thumb:hover {
-    background: rgba(0, 0, 0, 0.5);
-  }
-`;
-
-export const StyledMessage = styled.div`
-  display: flex;
-  justify-content: ${props => props.isUser ? 'flex-end' : 'flex-start'};
-  margin-bottom: clamp(8px, 1vh, 12px);
-`;
-
-export const StyledMessageText = styled.div`
-  max-width: 80%;
-  padding: clamp(10px, 1.2vw, 12px) clamp(14px, 1.8vw, 16px);
-  border-radius: 12px;
-  font-size: clamp(13px, 1.1vw, 14px);
-  font-family: 'DM Sans', sans-serif;
-  font-weight: 400;
-  line-height: 1.4;
-  word-wrap: break-word;
-
-  ${props => props.isUser ? `
-    background: #007AFF;
-    color: white;
-    border-bottom-right-radius: 4px;
-  ` : `
-    background: rgba(245, 245, 245, 0.9);
-    color: #160211;
-    border-bottom-left-radius: 4px;
-  `}
-
-  ${media.mobile} {
-    max-width: 90%;
-    font-size: 14px;
-  }
 `;
