@@ -4,6 +4,9 @@ import {
   StyledEllipse9,
   StyledEllipse10,
   StyledHeader,
+  StyledLogoContainer,
+  StyledLogo,
+  StyledBrandTitle,
   StyledNavigationPillList,
   StyledNavigationPill,
   StyledTitle,
@@ -250,6 +253,16 @@ export const ChatBotUI = () => {
       <StyledEllipse10 />
       
       <StyledHeader>
+        <StyledLogoContainer>
+          <StyledLogo>
+            <img 
+              src="/logo512.png" 
+              alt="Company Logo" 
+              style={{ height: '100%', width: 'auto' }}
+            />
+          </StyledLogo>
+          <StyledBrandTitle>SafeOfMind</StyledBrandTitle>
+        </StyledLogoContainer>
         <StyledNavigationPillList>
           <StyledNavigationPill>
             <StyledTitle>Resources</StyledTitle>

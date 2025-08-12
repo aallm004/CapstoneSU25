@@ -62,13 +62,13 @@ export const StyledHeader = styled.div`
   width: 100%;
   height: auto;
   min-height: 105px;
-  padding: clamp(16px, 2.5vw, 32px);
+  padding: clamp(24px, 3.5vw, 40px) clamp(16px, 2.5vw, 32px); /* Increased top/bottom padding */
   position: relative;
   background: white;
   border-bottom: 1px solid #D9D9D9;
   display: flex;
-  justify-content: flex-end;
-  align-items: center;
+  justify-content: space-between;
+  align-items: center; /* This centers items vertically */
   gap: 24px;
   flex-wrap: wrap;
   z-index: 10;
@@ -76,7 +76,8 @@ export const StyledHeader = styled.div`
   ${media.tablet} {
     flex-direction: column;
     gap: 16px;
-    padding: 20px 16px;
+    padding: 24px 16px; /* Increased vertical padding on mobile too */
+    justify-content: center;
   }
 `;
 
@@ -352,4 +353,43 @@ export const StyledSendIcon = styled.div`
   height: clamp(13px, 1.8vw, 16px);
   background: #1D1B20;
   clip-path: polygon(0 50%, 100% 0, 100% 100%);
+`;
+
+export const StyledLogo = styled.div`
+  height: clamp(32px, 4vw, 48px);
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+
+  ${media.tablet} {
+    height: 32px;
+    margin-bottom: 8px;
+  }
+`;
+
+export const StyledLogoContainer = styled.div`
+  display: flex;
+  align-items: center;
+  gap: clamp(12px, 1.5vw, 16px);
+
+  ${media.tablet} {
+    margin-bottom: 8px;
+  }
+`;
+
+export const StyledBrandTitle = styled.h1`
+  font-size: clamp(20px, 2.5vw, 28px);
+  font-family: 'Manrope', sans-serif;
+  font-weight: 700;
+  margin: 0;
+  background: linear-gradient(135deg, #2c2c2c 0%, #6b6b6b 50%, #9a9a9a 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  letter-spacing: -0.02em;
+  line-height: 1;
+
+  ${media.tablet} {
+    font-size: clamp(18px, 4vw, 24px);
+  }
 `;
