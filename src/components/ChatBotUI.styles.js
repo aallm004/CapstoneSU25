@@ -222,11 +222,11 @@ export const StyledMessageText = styled.div`
 
   ${props => props.$isUser ? `
     background: #B5EECB;
-    color: white;
+    color: #333333;
     border-bottom-right-radius: 4px;
   ` : `
     background: rgba(245, 245, 245, 0.9);
-    color: #160211;
+    color: #333333;
     border-bottom-left-radius: 4px;
   `}
 
