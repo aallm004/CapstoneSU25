@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import {
   StyledChatBotUI,
   StyledEllipse9,
@@ -32,23 +32,104 @@ export const ChatBotUI = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [debugInfo, setDebugInfo] = useState([]);
   
-  // Your API configuration
+  const messagesEndRef = useRef(null);
+  const chatMessagesRef = useRef(null);
+  
   const API_BASE = "https://dczq55guecss3nfqektmhapolq0dgnkw.lambda-url.us-east-1.on.aws/messages";
 
-  
+  // format api responses
+  const formatResponse = (text) => {
+    if (!text) return text;
+
+    console.log('=== FORMATTING TEXT ===');
+    console.log('Raw text:', text);
+    console.log('Text type:', typeof text);
+    console.log('Text length:', text.length);
+
+    const textString = String(text);
+
+    const lines = textString.split(/\r?\n/).filter(line => line.trim() !== '');
+    console.log('Split into lines:', lines);
+    
+    const formattedElements = lines.map((line, index) => {
+      let formattedContent = line.trim();
+      console.log(`Processing line ${index}:`, formattedContent);
+      
+      formattedContent = formattedContent.replace(/\[b\](.*?)\[\/b\]/g, '<strong>$1</strong>');
+      
+      formattedContent = formattedContent.replace(/\[i\](.*?)\[\/i\]/g, '<em>$1</em>');
+      
+      formattedContent = formattedContent.replace(/\[url\](.*?)\[\/url\]/g, '<a href="https://$1" target="_blank" rel="noopener noreferrer" style="color: #007AFF; text-decoration: underline;">$1</a>');
+      
+      console.log(`After formatting:`, formattedContent);
+      
+      if (/^\d+\./.test(formattedContent.trim())) {
+        return (
+          <div key={index} style={{ margin: '8px 0', paddingLeft: '16px', lineHeight: '1.6' }} 
+               dangerouslySetInnerHTML={{ __html: formattedContent }} />
+        );
+      }
+      
+      if (/^\s*[-•*]/.test(formattedContent) || formattedContent.includes('* ')) {
+        formattedContent = formattedContent.replace(/^\s*[-•*]\s*/, '• ');
+        return (
+          <div key={index} style={{ margin: '4px 0', paddingLeft: '20px', lineHeight: '1.6' }} 
+               dangerouslySetInnerHTML={{ __html: formattedContent }} />
+        );
+      }
+      
+      if (formattedContent.trim().endsWith(':') && formattedContent.length < 100) {
+        return (
+          <div key={index} style={{ fontWeight: 'bold', margin: '16px 0 8px 0', color: '#160211', lineHeight: '1.6' }} 
+               dangerouslySetInnerHTML={{ __html: formattedContent }} />
+        );
+      }
+      
+      return (
+        <div key={index} style={{ margin: '8px 0', lineHeight: '1.6' }} 
+             dangerouslySetInnerHTML={{ __html: formattedContent }} />
+      );
+    });
+
+    console.log('Returning formatted elements:', formattedElements);
+    return formattedElements;
+  };
+
+  const scrollToBottom = () => {
+    if (messagesEndRef.current) {
+      messagesEndRef.current.scrollIntoView({ 
+        behavior: "smooth",
+        block: "nearest"
+      });
+    }
+    
+    if (chatMessagesRef.current) {
+      setTimeout(() => {
+        chatMessagesRef.current.scrollTop = chatMessagesRef.current.scrollHeight;
+      }, 100);
+    }
+  };
+
+  useEffect(() => {
+    scrollToBottom();
+    
+    const timer = setTimeout(scrollToBottom, 150);
+    
+    return () => clearTimeout(timer);
+  }, [messages]);
+
   const suggestions = [
     "What can I ask you to do?",
     "I need some help with my emotions", 
     "I would like some recommendations for what to do when I am overwhelmed"
   ];
 
-  // Add debug message to help troubleshoot
   const addDebugInfo = (info) => {
     console.log("DEBUG:", info);
     setDebugInfo(prev => [...prev.slice(-4), `${new Date().toLocaleTimeString()}: ${info}`]);
   };
 
-  // Test API connectivity
+  // test api connection
   const testAPIConnection = async () => {
     addDebugInfo("Testing API connection...");
     
@@ -83,9 +164,6 @@ export const ChatBotUI = () => {
         "Content-Type": "application/json",
       };
 
-
-
-      // Send the message
       const requestBody = { messages: MESSAGES };
       addDebugInfo(`Request URL: ${API_BASE}/messages`);
       addDebugInfo(`Request body: ${JSON.stringify(requestBody)}`);
@@ -98,19 +176,16 @@ export const ChatBotUI = () => {
 
       addDebugInfo(`Response status: ${response.status} ${response.statusText}`);
 
-      // Get response text first to see what we're actually receiving
-      const responseText = await response.text();
-      addDebugInfo(`Raw response: ${responseText.substring(0, 200)}${responseText.length > 200 ? '...' : ''}`);
-      let data = JSON.parse(responseText);
-      let latestMessage = data.messages.slice(-1)[0];
-      console.log(latestMessage);
-      MESSAGES.push(latestMessage);
-      return latestMessage;
-
       if (!response.ok) {
+        const responseText = await response.text();
+        addDebugInfo(`Error response: ${responseText.substring(0, 200)}${responseText.length > 200 ? '...' : ''}`);
         throw new Error(`HTTP error! status: ${response.status}, body: ${responseText}`);
       }
 
+      const responseText = await response.text();
+      addDebugInfo(`Raw response: ${responseText.substring(0, 200)}${responseText.length > 200 ? '...' : ''}`);
+      
+      let data;
       try {
         data = JSON.parse(responseText);
         addDebugInfo(`Parsed JSON successfully, keys: ${Object.keys(data).join(', ')}`);
@@ -119,23 +194,24 @@ export const ChatBotUI = () => {
         throw new Error(`Invalid JSON response: ${responseText}`);
       }
 
-      // Log the full response structure
       console.log("Full API Response:", data);
       
-      // NEW APPROACH: Check if the API returned a direct response
+      if (data.messages && Array.isArray(data.messages) && data.messages.length > 0) {
+        let latestMessage = data.messages.slice(-1)[0];
+        console.log(latestMessage);
+        MESSAGES.push(latestMessage);
+        return latestMessage;
+      }
+      
       if (data.response) {
         addDebugInfo(`Found direct response: "${data.response.substring(0, 100)}..."`);
         return data.response;
       }
 
-      // If no direct response, your backend might be storing the message
-      // and we need to implement a polling mechanism or separate endpoint
       addDebugInfo("No direct response found. Implementing fallback strategy...");
       
-      // Strategy 1: Wait a moment and check for new messages
       await new Promise(resolve => setTimeout(resolve, 2000)); // Wait 2 seconds
       
-      // Try to get the latest messages
       const getResponse = await fetch(API_BASE, {
         method: "GET",
         headers: headers
@@ -145,11 +221,9 @@ export const ChatBotUI = () => {
         const getData = await getResponse.json();
         addDebugInfo(`GET response keys: ${Object.keys(getData).join(', ')}`);
         
-        // Check if there are messages and find the latest assistant response
         if (getData.messages && Array.isArray(getData.messages)) {
           addDebugInfo(`Found ${getData.messages.length} messages`);
           
-          // Look for the most recent assistant message
           const latestMessage = getData.messages.slice(-1);
           
             if (latestMessage) {
@@ -161,8 +235,6 @@ export const ChatBotUI = () => {
           
       }
       
-      
-      // If we still don't have a response, return an informative message
       addDebugInfo("Backend issue detected: API receives messages but doesn't generate responses");
       return `I received your message: "${message}"\n\n⚠️ Backend Issue Detected:\nYour API is storing messages but not generating LLM responses. You need to:\n\n1. Add LLM integration to your backend\n2. Generate assistant responses when messages are posted\n3. Return the assistant response in the API response\n\nCheck your backend code for missing LLM integration.`;
       
@@ -170,7 +242,6 @@ export const ChatBotUI = () => {
       addDebugInfo(`API Error: ${error.message}`);
       console.error("Full API Error:", error);
       
-      // Return a detailed error message for debugging
       return `❌ API Error: ${error.message}\n\nThis could be due to:\n• Network connectivity issues\n• CORS problems\n• Backend server errors\n• Invalid API endpoint\n\nCheck the browser console for detailed logs.`;
     }
   };
@@ -183,7 +254,6 @@ export const ChatBotUI = () => {
     if (inputValue.trim() && !isLoading) {
       const userMessage = inputValue.trim();
       
-      // Add user message immediately
       const newUserMessage = {
         id: Date.now(),
         text: userMessage,
@@ -191,11 +261,10 @@ export const ChatBotUI = () => {
       };
       setMessages(prev => [...prev, newUserMessage]);
       
-      // Clear input and set loading state
       setInputValue("");
       setIsLoading(true);
       
-      // Add a "thinking" message
+      // Adds "thinking" message
       const thinkingMessage = {
         id: Date.now() + 1,
         text: "Thinking...",
@@ -205,23 +274,23 @@ export const ChatBotUI = () => {
       setMessages(prev => [...prev, thinkingMessage]);
       
       try {
-        // Call your API
         const apiResponse = await sendMessageToAPI(userMessage);
         
-        // Remove thinking message and add real response
         setMessages(prev => {
           const filteredMessages = prev.filter(msg => !msg.isThinking);
           return [...filteredMessages, {
             id: Date.now() + 2,
             text: apiResponse,
-            sender: 'assistant'
+            sender: 'assistant',
+            formatted: true
           }];
         });
+        
+        setTimeout(scrollToBottom, 200);
         
       } catch (error) {
         console.error("Error sending message:", error);
         
-        // Remove thinking message and add error message
         setMessages(prev => {
           const filteredMessages = prev.filter(msg => !msg.isThinking);
           return [...filteredMessages, {
@@ -230,6 +299,9 @@ export const ChatBotUI = () => {
             sender: 'assistant'
           }];
         });
+        
+
+        setTimeout(scrollToBottom, 200);
       } finally {
         setIsLoading(false);
       }
@@ -305,7 +377,7 @@ export const ChatBotUI = () => {
 
       {/* Chat Container */}
       <StyledChatContainer>
-        <StyledChatMessages>
+        <StyledChatMessages ref={chatMessagesRef}>
           {messages.length === 0 ? (
             <StyledMessage>
               <StyledMessageText style={{ fontStyle: 'italic', opacity: 0.7 }}>
@@ -321,16 +393,21 @@ export const ChatBotUI = () => {
             </StyledMessage>
           ) : (
             messages.map((message) => (
-              <StyledMessage key={message.id} isUser={message.sender === 'user'}>
+              <StyledMessage key={message.id} $isUser={message.sender === 'user'}>
                 <StyledMessageText 
-                  isUser={message.sender === 'user'}
+                  $isUser={message.sender === 'user'}
                   style={message.isThinking ? { fontStyle: 'italic', opacity: 0.8 } : {}}
                 >
-                  {message.text}
+                  {message.sender === 'assistant' && !message.isThinking ? 
+                    formatResponse(message.text) : 
+                    message.text
+                  }
                 </StyledMessageText>
               </StyledMessage>
             ))
           )}
+          {/* Invisible element to scroll to */}
+          <div ref={messagesEndRef} />
         </StyledChatMessages>
       </StyledChatContainer>
 

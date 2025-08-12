@@ -159,7 +159,7 @@ export const StyledChatContainer = styled.div`
   width: calc(100% - clamp(40px, 6vw, 80px));
   max-width: 800px;
   height: clamp(200px, 30vh, 300px);
-  background: rgba(255, 255, 255, 0.75);
+  background: rgba(255, 255, 255, 0.25);
   backdrop-filter: blur(10px);
   border-radius: 12px;
   border: 1px solid rgba(255, 255, 255, 0.3);
@@ -206,7 +206,7 @@ export const StyledChatMessages = styled.div`
 
 export const StyledMessage = styled.div`
   display: flex;
-  justify-content: ${props => props.isUser ? 'flex-end' : 'flex-start'};
+  justify-content: ${props => props.$isUser ? 'flex-end' : 'flex-start'};
   margin-bottom: clamp(8px, 1vh, 12px);
 `;
 
@@ -220,8 +220,8 @@ export const StyledMessageText = styled.div`
   line-height: 1.4;
   word-wrap: break-word;
 
-  ${props => props.isUser ? `
-    background: #007AFF;
+  ${props => props.$isUser ? `
+    background: #B5EECB;
     color: white;
     border-bottom-right-radius: 4px;
   ` : `
