@@ -1,4 +1,5 @@
 import React, { useState, useRef, useEffect } from "react";
+import { useNavigate } from 'react-router-dom';
 import {
   StyledChatBotUI,
   StyledEllipse9,
@@ -33,6 +34,17 @@ export const ChatBotUI = () => {
   const [inputValue, setInputValue] = useState("");
   const [messages, setMessages] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
+
+  const navigate = useNavigate();
+
+  const handleNavigation = (page) => {
+    if (page === 'resources') {
+      navigate('/resources');
+    } else if (page === 'home') {
+      navigate('/');
+    }
+  };
+
   
   const messagesEndRef = useRef(null);
   const chatMessagesRef = useRef(null);
@@ -254,7 +266,7 @@ export const ChatBotUI = () => {
       
       <StyledHeader>
         <StyledLogoContainer>
-          <StyledLogo>
+          <StyledLogo onClick={() => navigate('/')} style={{ cursor: 'pointer' }}>
             <img 
               src="/logo512.png" 
               alt="Company Logo" 
@@ -264,10 +276,11 @@ export const ChatBotUI = () => {
           <StyledBrandTitle>SafeOfMind</StyledBrandTitle>
         </StyledLogoContainer>
         <StyledNavigationPillList>
-          <StyledNavigationPill>
+          <StyledNavigationPill onClick={() => handleNavigation('resources')}>
             <StyledTitle>Resources</StyledTitle>
           </StyledNavigationPill>
-          <StyledNavigationPill>
+          <StyledNavigationPill onClick={() => window.open('https://linktr.ee/SafeOfMind', '_blank')}
+              style={{ cursor: 'pointer' }}>
             <StyledTitle>Contact</StyledTitle>
           </StyledNavigationPill>
         </StyledNavigationPillList>

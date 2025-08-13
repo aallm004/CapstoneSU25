@@ -27,10 +27,12 @@ export const StyledChatBotUI = styled.div`
   overflow-x: hidden;
   border-radius: clamp(16px, 2.5vw, 32px);
   margin: 0 auto;
+  padding-top: clamp(105px, 15vh, 145px);
 
   ${media.mobile} {
     border-radius: 0;
     min-height: 100vh;
+    padding-top: clamp(120px, 18vh, 160px);
   }
 `;
 
@@ -62,21 +64,24 @@ export const StyledHeader = styled.div`
   width: 100%;
   height: auto;
   min-height: 105px;
-  padding: clamp(24px, 3.5vw, 40px) clamp(16px, 2.5vw, 32px); /* Increased top/bottom padding */
-  position: relative;
+  padding: clamp(24px, 3.5vw, 40px) clamp(16px, 2.5vw, 32px);
+  position: fixed; /* Changed from relative to fixed */
+  top: 0; /* Added to stick to top */
+  left: 0; /* Added for proper positioning */
   background: white;
   border-bottom: 1px solid #D9D9D9;
   display: flex;
   justify-content: space-between;
-  align-items: center; /* This centers items vertically */
+  align-items: center;
   gap: 24px;
   flex-wrap: wrap;
-  z-index: 10;
+  z-index: 100; /* Increased z-index to stay above other content */
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1); /* Added subtle shadow */
 
   ${media.tablet} {
     flex-direction: column;
     gap: 16px;
-    padding: 24px 16px; /* Increased vertical padding on mobile too */
+    padding: 24px 16px;
     justify-content: center;
   }
 `;
@@ -122,7 +127,7 @@ export const StyledFrame22 = styled.div`
   max-width: 409px;
   position: absolute;
   left: 50%;
-  top: clamp(140px, 25vh, 207px);
+  top: clamp(180px, 30vh, 250px);
   transform: translateX(-50%);
   display: flex;
   flex-direction: column;
@@ -135,7 +140,7 @@ export const StyledFrame22 = styled.div`
   ${media.mobile} {
     position: relative;
     transform: none;
-    margin: clamp(80px, 15vh, 140px) auto clamp(40px, 8vh, 80px);
+    margin: clamp(120px, 20vh, 180px) auto clamp(40px, 8vh, 80px);
     padding: 0 16px;
     left: auto;
     top: auto;
@@ -154,12 +159,12 @@ export const StyledAskOurAssistantAnything = styled.span`
 
 export const StyledChatContainer = styled.div`
   position: absolute;
-  top: clamp(280px, 45vh, 350px);
+  top: clamp(280px, 42vh, 350px);
   left: 50%;
   transform: translateX(-50%);
   width: calc(100% - clamp(40px, 6vw, 80px));
   max-width: 800px;
-  height: clamp(200px, 30vh, 300px);
+  height: clamp(250px, 35vh, 350px);
   background: rgba(255, 255, 255, 0.25);
   backdrop-filter: blur(10px);
   border-radius: 12px;
@@ -171,10 +176,10 @@ export const StyledChatContainer = styled.div`
     position: relative;
     transform: none;
     width: calc(100% - 32px);
-    margin: clamp(40px, 8vh, 60px) auto clamp(20px, 4vh, 40px);
+    margin: clamp(60px, 8vh, 80px) auto clamp(20px, 4vh, 40px);
     left: auto;
     top: auto;
-    height: clamp(250px, 35vh, 350px);
+    height: clamp(280px, 40vh, 380px);
   }
 `;
 
