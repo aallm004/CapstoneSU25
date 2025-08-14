@@ -1,6 +1,6 @@
 import styled from "styled-components";
 
-// Responsive breakpoints
+
 const breakpoints = {
   mobile: '480px',
   tablet: '768px',
@@ -8,7 +8,7 @@ const breakpoints = {
   desktop: '1280px'
 };
 
-// Media query helper
+
 const media = {
   mobile: `@media (max-width: ${breakpoints.mobile})`,
   tablet: `@media (max-width: ${breakpoints.tablet})`,
@@ -65,9 +65,9 @@ export const StyledHeader = styled.div`
   height: auto;
   min-height: 105px;
   padding: clamp(24px, 3.5vw, 40px) clamp(16px, 2.5vw, 32px);
-  position: fixed; /* Changed from relative to fixed */
-  top: 0; /* Added to stick to top */
-  left: 0; /* Added for proper positioning */
+  position: fixed;
+  top: 0;
+  left: 0;
   background: white;
   border-bottom: 1px solid #D9D9D9;
   display: flex;
@@ -75,8 +75,8 @@ export const StyledHeader = styled.div`
   align-items: center;
   gap: 24px;
   flex-wrap: wrap;
-  z-index: 100; /* Increased z-index to stay above other content */
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1); /* Added subtle shadow */
+  z-index: 100;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
 
   ${media.tablet} {
     flex-direction: column;

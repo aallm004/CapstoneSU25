@@ -1,6 +1,6 @@
 import styled from "styled-components";
 
-// Responsive breakpoints (matching your existing styles)
+
 const breakpoints = {
   mobile: '480px',
   tablet: '768px',
@@ -17,7 +17,7 @@ const media = {
 
 export const StyledResourcesContainer = styled.div`
   position: relative;
-  top: 0; /* Reset top positioning */
+  top: 0;
   left: 50%;
   transform: translateX(-50%);
   width: calc(100% - clamp(40px, 6vw, 80px));
